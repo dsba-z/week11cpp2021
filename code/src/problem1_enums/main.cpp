@@ -7,6 +7,13 @@ enum StudentsTraits {
     stAsksQuestions = 8
 }; 
 
+enum CardinalDirection {
+    East = 1,
+    West = 2,
+    North = 4,
+    South = 8
+}; 
+
 
 
 bool checkAttendsClasses(int studentTraits)
