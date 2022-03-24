@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <fstream>
+
 int getBitAtIndex(unsigned int number, int idx)
 {
     int bit = 0;
@@ -16,6 +18,9 @@ int countOnes(unsigned long long  number)
 void printBinary(unsigned int  number)
 {
     
+    
+    
+    int b = 0b101010; // C++14
 }
 
 template<typename T>
@@ -36,6 +41,10 @@ void testAnswer(int testNum, const std::string message, T answer, T correctAnswe
 
 int main()
 {
+    
+    std::ifstream("input.txt", std::ios_base::binary | std::ios_base::app);
+    
+    
     unsigned int  number = 9;
     int idx = 2;
     
