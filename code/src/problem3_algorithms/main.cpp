@@ -36,6 +36,8 @@ struct Passenger
 
 typedef std::vector<Passenger> VecPassengers;
 
+const int DEFAULT_AGE = 0;
+
 
 std::ostream& operator<<(std::ostream& out, Passenger p)
 {
@@ -67,19 +69,23 @@ PClass toPClass(const std::string& buffer)
 
 int toInt(const std::string& buffer)
 {
-    std::stringstream ssid(buffer);
-    int id = 0;
-    ssid >> id;
-    return id;
+    int i;
+    try
+    {
+      i =  std::stoi(buffer);
+    }
+    catch(std::invalid_argument const& ex)
+    {
+      std::cerr << "std::invalid_argument: " << ex.what() << "\n";
+      std::cerr << "Could not parse string: '" << buffer <<"'\n";
+      std::cerr << "Using value " << DEFAULT_AGE << " as default" << '\n';
+      i = DEFAULT_AGE;
+    }
+
+    return i;
+    
 }
 
-double toDouble(const std::string& buffer)
-{
-    std::stringstream ssid(buffer);
-    double id = 0;
-    ssid >> id;
-    return id;
-}
 
 Passenger extractData(std::istream& in)
 {
@@ -114,7 +120,7 @@ Passenger extractData(std::istream& in)
     newPassenger.ticket = buffer;
     
     std::getline(in, buffer, ','); // fare
-    newPassenger.fare = toDouble(buffer);
+    newPassenger.fare = std::stod(buffer);
 
     std::getline(in, buffer, ','); // Cabin
     newPassenger.cabin = buffer;
