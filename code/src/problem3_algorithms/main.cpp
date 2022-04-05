@@ -59,7 +59,17 @@ public:
     }
     void setMode(PassengerField pf) {}
     
-    bool operator() (const Passenger& a, const Passenger& b) {}
+    bool operator() (const Passenger& a, const Passenger& b) {
+        switch(compareField) {
+        case PassengerField::Id:
+            return a.id < b.id;
+        case PassengerField::Survived:
+            return a.survived < b.survived;
+        default:
+            return a.id < b.id;
+        }
+        
+    }
     
 };
 
@@ -106,9 +116,9 @@ int toInt(const std::string& buffer)
     }
     catch(std::invalid_argument const& ex)
     {
-      std::cerr << "std::invalid_argument: " << ex.what() << "\n";
-      std::cerr << "Could not parse string: '" << buffer <<"'\n";
-      std::cerr << "Using value " << DEFAULT_AGE << " as default" << '\n';
+//      std::cerr << "std::invalid_argument: " << ex.what() << "\n";
+//      std::cerr << "Could not parse string: '" << buffer <<"'\n";
+//      std::cerr << "Using value " << DEFAULT_AGE << " as default" << '\n';
       i = DEFAULT_AGE;
     }
 
