@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iomanip>
 
+
 enum class PClass{
     Upper = 1,
     Middle = 2,
@@ -37,6 +38,38 @@ struct Passenger
 typedef std::vector<Passenger> VecPassengers;
 
 const int DEFAULT_AGE = 0;
+
+enum class PassengerField {
+    Id,
+    Survived,
+    PClass,
+    Name,
+    Sex,
+    Age,
+    SibSp
+};
+
+class PassengerComparator
+{
+    PassengerField compareField;
+public:
+    
+    PassengerComparator(PassengerField pf) {}
+    
+    void setMode(PassengerField pf) {}
+    
+    bool operator() (const Passenger& a, const Passenger& b)
+    {
+        switch(compareField) {
+        case PassengerField::Id:
+            return a.id < b.id;
+        case PassengerField::Name:
+            return a.name < b.name;
+        default:
+            return a.id < b.id;
+        }
+    }
+};
 
 
 std::ostream& operator<<(std::ostream& out, Passenger p)
@@ -147,9 +180,32 @@ VecPassengers loadData(std::istream& in)
 
 int main ()
 {
+//    int variable = PClassPlain::Upper;
+    
+    int variableClass = static_cast<int>(PClass::Upper);
+    
+    PassengerField pf = PassengerField::Id;
+    
+    PassengerComparator pc(pf);
+    
+    
+    
+    
     const std::string INPUT_FILE_NAME = "../../data/titanic.csv";
     std::ifstream inputFile;
     inputFile.open(INPUT_FILE_NAME);
     VecPassengers passengers = loadData(inputFile);
     std::cout << passengers[0];
+    
+    
+    Passenger a = passengers[0];
+    Passenger b = passengers[1];
+    
+    bool result = pc(a, b);
+    
+    std::sort(passengers.begin(), passengers.end(), pc);
+    pc.setMode(PassengerField::Name);
+    
+    std::sort(passengers.begin(), passengers.end(), pc);
+    
 }
