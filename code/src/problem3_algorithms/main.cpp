@@ -4,6 +4,15 @@
 #include <vector>
 #include <algorithm>
 #include <iomanip>
+#include <set>
+
+
+enum PClassNonClass{
+    Upper = 1,
+    Middle = 2,
+    Lower = 3,
+    NoInfo
+};
 
 enum class PClass{
     Upper = 1,
@@ -33,6 +42,27 @@ struct Passenger
     std::string cabin;
     std::string embarked;
 };
+
+enum class PassengerField{
+    Id,
+    Survived,
+    Name
+    
+};
+
+class PassengerComparator
+{
+    PassengerField compareField;
+public:
+    PassengerComparator(PassengerField pf) {
+        
+    }
+    void setMode(PassengerField pf) {}
+    
+    bool operator() (const Passenger& a, const Passenger& b) {}
+    
+};
+
 
 typedef std::vector<Passenger> VecPassengers;
 
@@ -147,9 +177,29 @@ VecPassengers loadData(std::istream& in)
 
 int main ()
 {
+    PassengerField pf = PassengerField::Id;
+    
+    PassengerComparator pc(pf);
+    
+    
+    
+//    int variable = PClassNonClass::Upper;
+    int variableClass = static_cast<int>(PClass::Upper);
+    
     const std::string INPUT_FILE_NAME = "../../data/titanic.csv";
     std::ifstream inputFile;
     inputFile.open(INPUT_FILE_NAME);
     VecPassengers passengers = loadData(inputFile);
     std::cout << passengers[0];
+    
+    
+    std::sort(passengers.begin(), passengers.end(), pc);
+    
+    pc.setMode(PassengerField::Name);
+    std::sort(passengers.begin(), passengers.end(), pc);
+    
+    std::set<Passenger, PassengerComparator> pset(pc);
+    
+    
+    
 }
