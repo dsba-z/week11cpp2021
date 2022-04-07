@@ -4,6 +4,8 @@ Spring semester 2021/22
 
 Exceptions. Reading incorrect data.
 
+Online IDE version (click "Fork" to run it yourself): https://replit.com/@l8doku/Workshop23FunctionObjects
+
 ## Task 1. Warnings.
 
 You have a function that reads data and fills empty "ID", "Age", "SibSp" and "Parch" cells with 0. However, there are no checks implemented for some other columns, and if empty data appears in them, the program will not work.
