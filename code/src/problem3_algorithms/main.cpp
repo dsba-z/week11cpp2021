@@ -86,19 +86,28 @@ int toInt(const std::string& buffer)
     
 }
 
+void getlineWithException(std::istream& in, std::string& buffer, char delimiter)
+{
+    bool successfullyRead = bool(std::getline(in, buffer, delimiter));
+    if (!successfullyRead) {
+        throw std::runtime_error("Corrupt data for pclass");
+    }
+}
 
-Passenger extractData(std::istream& in)
+Passenger extractData(std::istream& in, bool ignoreErrors)
 {
     Passenger newPassenger;
     std::string buffer;
     
-    std::getline(in, buffer, ','); // ID
+    bool isDataCorrupt = false;
+    
+    isDataCorrupt = isDataCorrupt || !std::getline(in, buffer, ','); // ID
     newPassenger.id = toInt(buffer);
     
-    std::getline(in, buffer, ','); // survived
+    getlineWithException(in, buffer, ','); // survived
     newPassenger.survived = buffer == "1";
     
-    std::getline(in, buffer, ','); // pclass
+    getlineWithException(in, buffer, ',');
     newPassenger.pclass = toPClass(buffer);
     
     std::getline(in, buffer, ','); // full name
@@ -127,6 +136,11 @@ Passenger extractData(std::istream& in)
 
     std::getline(in, buffer, '\n'); // Embarked
     newPassenger.embarked = buffer;
+    
+    if (isDataCorrupt) {
+        throw std::runtime_error("Corrupt data");
+    }
+    
     return newPassenger;
 }
 
@@ -138,8 +152,18 @@ VecPassengers loadData(std::istream& in)
     while(std::getline(in, buffer))
     {
         std::stringstream lineStream(buffer);
-        Passenger newPass = extractData(lineStream);
-        passengers.push_back(newPass);
+        bool ignoreErrors = false;
+        try
+        {
+           Passenger newPass = extractData(lineStream, ignoreErrors);
+           passengers.push_back(newPass);
+        }
+        catch(std::runtime_error const& ex)
+        {
+            // if ignoring errors
+            Passenger newPass = extractData(lineStream, true);
+           // warn the user that a row was skipped
+        }
     }
     return passengers;
 }
