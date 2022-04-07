@@ -76,9 +76,9 @@ int toInt(const std::string& buffer)
     }
     catch(std::invalid_argument const& ex)
     {
-      std::cerr << "std::invalid_argument: " << ex.what() << "\n";
-      std::cerr << "Could not parse string: '" << buffer <<"'\n";
-      std::cerr << "Using value " << DEFAULT_AGE << " as default" << '\n';
+//      std::cerr << "std::invalid_argument: " << ex.what() << "\n";
+//      std::cerr << "Could not parse string: '" << buffer <<"'\n";
+//      std::cerr << "Using value " << DEFAULT_AGE << " as default" << '\n';
       i = DEFAULT_AGE;
     }
 
@@ -86,16 +86,22 @@ int toInt(const std::string& buffer)
     
 }
 
-
-Passenger extractData(std::istream& in)
+void getLineWithException(std::istream& in, std::string& buffer, char delimiter)
 {
-    Passenger newPassenger;
+    if(!std::getline(in, buffer, delimiter))
+    {
+        throw std::runtime_error("corrupted data");
+    }
+}
+
+void extractData(std::istream& in, Passenger& newPassenger)
+{
     std::string buffer;
     
-    std::getline(in, buffer, ','); // ID
+    getLineWithException(in, buffer, ','); // ID
     newPassenger.id = toInt(buffer);
     
-    std::getline(in, buffer, ','); // survived
+    getLineWithException(in, buffer, ','); // survived
     newPassenger.survived = buffer == "1";
     
     std::getline(in, buffer, ','); // pclass
@@ -127,7 +133,7 @@ Passenger extractData(std::istream& in)
 
     std::getline(in, buffer, '\n'); // Embarked
     newPassenger.embarked = buffer;
-    return newPassenger;
+//    return newPassenger;
 }
 
 VecPassengers loadData(std::istream& in)
@@ -138,7 +144,8 @@ VecPassengers loadData(std::istream& in)
     while(std::getline(in, buffer))
     {
         std::stringstream lineStream(buffer);
-        Passenger newPass = extractData(lineStream);
+        Passenger newPass;
+        extractData(lineStream, newPass);
         passengers.push_back(newPass);
     }
     return passengers;
