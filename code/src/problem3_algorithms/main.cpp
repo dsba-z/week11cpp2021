@@ -66,6 +66,24 @@ PClass toPClass(const std::string& buffer)
     return pclass;
 }
 
+int toDouble(const std::string& buffer)
+{
+    double i;
+    try
+    {
+      i =  std::stod(buffer);
+    }
+    catch(std::invalid_argument const& ex)
+    {
+//      std::cerr << "std::invalid_argument: " << ex.what() << "\n";
+//      std::cerr << "Could not parse string: '" << buffer <<"'\n";
+//      std::cerr << "Using value " << DEFAULT_AGE << " as default" << '\n';
+      i = 0;
+    }
+
+    return i;
+    
+}
 
 int toInt(const std::string& buffer)
 {
@@ -76,9 +94,9 @@ int toInt(const std::string& buffer)
     }
     catch(std::invalid_argument const& ex)
     {
-      std::cerr << "std::invalid_argument: " << ex.what() << "\n";
-      std::cerr << "Could not parse string: '" << buffer <<"'\n";
-      std::cerr << "Using value " << DEFAULT_AGE << " as default" << '\n';
+//      std::cerr << "std::invalid_argument: " << ex.what() << "\n";
+//      std::cerr << "Could not parse string: '" << buffer <<"'\n";
+//      std::cerr << "Using value " << DEFAULT_AGE << " as default" << '\n';
       i = DEFAULT_AGE;
     }
 
@@ -86,46 +104,53 @@ int toInt(const std::string& buffer)
     
 }
 
+void getLineWithException(std::istream& in, std::string& buffer, char delimiter)
+{
+    if (!std::getline(in, buffer, delimiter))
+    {
+        throw std::runtime_error("Corrupt data");
+    }
+}
 
 Passenger extractData(std::istream& in)
 {
     Passenger newPassenger;
     std::string buffer;
     
-    std::getline(in, buffer, ','); // ID
+    getLineWithException(in, buffer, ','); // ID
     newPassenger.id = toInt(buffer);
     
-    std::getline(in, buffer, ','); // survived
+    getLineWithException(in, buffer, ','); // survived
     newPassenger.survived = buffer == "1";
     
-    std::getline(in, buffer, ','); // pclass
+    getLineWithException(in, buffer, ','); // pclass
     newPassenger.pclass = toPClass(buffer);
     
-    std::getline(in, buffer, ','); // full name
+    getLineWithException(in, buffer, ','); // full name
     newPassenger.name = buffer;
     
-    std::getline(in, buffer, ','); // sex
+    getLineWithException(in, buffer, ','); // sex
     newPassenger.sex = buffer == "male"? Sex::Male : Sex::Female;
     
-    std::getline(in, buffer, ','); // age
+    getLineWithException(in, buffer, ','); // age
     newPassenger.age = toInt(buffer);
     
-    std::getline(in, buffer, ','); // sibsp
+    getLineWithException(in, buffer, ','); // sibsp
     newPassenger.sibsp = toInt(buffer);
     
-    std::getline(in, buffer, ','); // parch
+    getLineWithException(in, buffer, ','); // parch
     newPassenger.parch = toInt(buffer);
     
-    std::getline(in, buffer, ','); // ticket
+    getLineWithException(in, buffer, ','); // ticket
     newPassenger.ticket = buffer;
     
-    std::getline(in, buffer, ','); // fare
-    newPassenger.fare = std::stod(buffer);
+    getLineWithException(in, buffer, ','); // fare
+    newPassenger.fare = toDouble(buffer);
 
-    std::getline(in, buffer, ','); // Cabin
+    getLineWithException(in, buffer, ','); // Cabin
     newPassenger.cabin = buffer;
 
-    std::getline(in, buffer, '\n'); // Embarked
+    getLineWithException(in, buffer, '\n'); // Embarked
     newPassenger.embarked = buffer;
     return newPassenger;
 }
@@ -138,8 +163,16 @@ VecPassengers loadData(std::istream& in)
     while(std::getline(in, buffer))
     {
         std::stringstream lineStream(buffer);
-        Passenger newPass = extractData(lineStream);
-        passengers.push_back(newPass);
+        try
+        {
+            Passenger newPass = extractData(lineStream);
+            passengers.push_back(newPass);
+        }
+        catch(std::runtime_error const& ex)
+        {
+            std::cout << ex.what() << std::endl;
+            std::cout << buffer << std::endl;
+        }
     }
     return passengers;
 }
@@ -147,7 +180,7 @@ VecPassengers loadData(std::istream& in)
 
 int main ()
 {
-    const std::string INPUT_FILE_NAME = "../../data/titanic.csv";
+    const std::string INPUT_FILE_NAME = "../../data/titanic_no_columns.csv";
     std::ifstream inputFile;
     inputFile.open(INPUT_FILE_NAME);
     VecPassengers passengers = loadData(inputFile);
