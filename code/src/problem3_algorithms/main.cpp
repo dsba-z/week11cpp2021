@@ -46,6 +46,7 @@ enum class PassengerField {
     Name,
     Sex,
     Age,
+    Parch,
     SibSp
 };
 
@@ -54,9 +55,15 @@ class PassengerComparator
     PassengerField compareField;
 public:
     
-    PassengerComparator(PassengerField pf) {}
+    PassengerComparator(PassengerField pf) 
+    {
+        compareField = pf;
+    }
     
-    void setMode(PassengerField pf) {}
+    void setMode(PassengerField pf) 
+    {
+        compareField = pf;
+    }
     
     bool operator() (const Passenger& a, const Passenger& b)
     {
@@ -65,6 +72,12 @@ public:
             return a.id < b.id;
         case PassengerField::Name:
             return a.name < b.name;
+        case PassengerField::Age:
+            return a.age < b.age;
+        case PassengerField::PClass:
+            return a.pclass < b.pclass;
+        case PassengerField::Parch:
+            return a.parch < b.parch;
         default:
             return a.id < b.id;
         }
@@ -180,13 +193,8 @@ VecPassengers loadData(std::istream& in)
 
 int main ()
 {
-//    int variable = PClassPlain::Upper;
     
-    int variableClass = static_cast<int>(PClass::Upper);
-    
-    PassengerField pf = PassengerField::Id;
-    
-    PassengerComparator pc(pf);
+
     
     
     
@@ -197,15 +205,21 @@ int main ()
     VecPassengers passengers = loadData(inputFile);
     std::cout << passengers[0];
     
+//    First by age. If age is the same, by PClass. If PClass is the same, by number of
+//   parents/children (field “Parch”).
+    PassengerComparator pc(PassengerField::Parch);
     
-    Passenger a = passengers[0];
-    Passenger b = passengers[1];
+    std::stable_sort(passengers.begin(), passengers.end(), pc);
+    pc.setMode(PassengerField::PClass);
     
-    bool result = pc(a, b);
+    std::stable_sort(passengers.begin(), passengers.end(), pc);
     
-    std::sort(passengers.begin(), passengers.end(), pc);
-    pc.setMode(PassengerField::Name);
+    pc.setMode(PassengerField::Age);
     
-    std::sort(passengers.begin(), passengers.end(), pc);
+    std::stable_sort(passengers.begin(), passengers.end(), pc);
+    
+    for (int i = 0; i < 10; i ++) {
+        std::cout << passengers[i];
+    }
     
 }
