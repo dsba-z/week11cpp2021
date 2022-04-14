@@ -5,14 +5,16 @@
 #include <algorithm>
 #include <iomanip>
 
-enum class PClass{
+enum class PClass
+{
     Upper = 1,
     Middle = 2,
     Lower = 3,
     NoInfo
 };
 
-enum class Sex{
+enum class Sex
+{
     Male,
     Female,
     NoInfo
@@ -33,6 +35,31 @@ struct Passenger
     std::string cabin;
     std::string embarked;
 };
+
+// task 2
+// Potential problems:
+// 1. No file
+// 2. Data type is incorrect
+// 3. Data row is not full.
+enum class ErrorCode
+{
+    
+};
+
+// task 1
+// https://en.cppreference.com/w/cpp/error/exception
+class AppExceptExample : public std::runtime_error
+{
+    ErrorCode errorMessage;
+    // task 3
+    AppExceptExample(ErrorCode code, const char* errorMessage = "") 
+        :std::runtime_error(errorMessage)
+    {
+        
+    }
+};
+
+
 
 typedef std::vector<Passenger> VecPassengers;
 
@@ -149,7 +176,18 @@ int main ()
 {
     const std::string INPUT_FILE_NAME = "../../data/titanic.csv";
     std::ifstream inputFile;
-    inputFile.open(INPUT_FILE_NAME);
-    VecPassengers passengers = loadData(inputFile);
-    std::cout << passengers[0];
+    
+    // task 4
+    try {
+    
+        inputFile.open(INPUT_FILE_NAME);
+        VecPassengers passengers = loadData(inputFile);
+        std::cout << passengers[0];
+    }
+//    catch (/* fill here */){
+        
+//    }
+    catch (...) {
+    }
+    
 }
