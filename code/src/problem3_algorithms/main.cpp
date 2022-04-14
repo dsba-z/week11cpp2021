@@ -22,18 +22,74 @@ enum class Sex
 
 struct Passenger
 {
+    
+public:
+    
+    Passenger(int idInput)
+    {
+        id = idInput;
+    }
     unsigned int id;
     bool survived;
     PClass pclass;
     std::string name;
     Sex sex;
+    
+    
+protected:
     unsigned int age;
     unsigned int sibsp;
     unsigned int parch;
     std::string ticket;
+    
+    
+private:
     double fare;
     std::string cabin;
     std::string embarked;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+struct PassengerSpecificExample : public Passenger
+{
+    
+    std::string originCity;
+    
+    PassengerSpecificExample(int idInput, std::string cityName)
+        :Passenger(idInput)
+    {
+        originCity = cityName;
+    }
 };
 
 // task 2
@@ -50,7 +106,7 @@ enum class ErrorCode
 // https://en.cppreference.com/w/cpp/error/exception
 class AppExceptExample : public std::runtime_error
 {
-    ErrorCode errorMessage;
+    ErrorCode _code;
     // task 3
     AppExceptExample(ErrorCode code, const char* errorMessage = "") 
         :std::runtime_error(errorMessage)
@@ -176,17 +232,34 @@ int main ()
 {
     const std::string INPUT_FILE_NAME = "../../data/titanic.csv";
     std::ifstream inputFile;
+    int condition = true;
+    int a = condition ? 1 : 0;
+    int b;
+    if (condition) {
+        b = 1;
+    } else {
+        b = 0;
+    }
     
     // task 4
     try {
     
         inputFile.open(INPUT_FILE_NAME);
+        if (!inputFile.is_open())
+        {
+            throw AppExceptExample(ErrorCode::noFile);
+        }
         VecPassengers passengers = loadData(inputFile);
         std::cout << passengers[0];
     }
-//    catch (/* fill here */){
-        
-//    }
+    catch (const AppExceptExample& e){
+//        ErrorCode c = e._code;
+        switch(e._code) {
+        case ErrorCode::noFile:
+            std::cout << "no file\n";
+            break;
+        }
+    }
     catch (...) {
     }
     
