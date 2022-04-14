@@ -1,57 +1,19 @@
-# DSBA Introduction to Programming // Workshop 24
+# DSBA Introduction to Programming // Workshop 26
 Spring semester 2021/22
 
 
-Exceptions. Reading incorrect data.
+Custom Exceptions. Enums. Inheritance.
 
 Online IDE version (click "Fork" to run it yourself): https://replit.com/@l8doku/Workshop23FunctionObjects
 
-## Task 1. Warnings.
+Full instructions are included in the file [Workshop 26](/Workshop26-custom-exceptions.pdf).
 
-You have a function that reads data and fills empty "ID", "Age", "SibSp" and "Parch" cells with 0. However, there are no checks implemented for some other columns, and if empty data appears in them, the program will not work.
+## Tasks
 
-- Try loading data from the file "titanic_empty_fare.csv".
-
-- Fix the program so that it warns the user that the file was corrupted, similar to the existing check.
-
-
-## Task 2. Corrupted data.
-
-The original version of the program assumes that if a line was read correctly, it contains a correct number of columns. However, this may not be the case.
-
-- Try loading data from the file "titanic_no_columns.csv".
-
-- Add a check to the cell reading function `extractData` to see if all the cells were read correctly. Give a warning and skip the row, if there was a mistake in that row.
-
-To skip the row, move the line that adds a passenger to the vector to a `try` block like this:
-
-```cpp
-        std::stringstream lineStream(buffer);
-        try
-        {
-            Passenger newPass = extractData(lineStream);
-            passengers.push_back(newPass);
-        }
-        catch(std::runtime_error const& ex)
-        {
-            // warn the user that a row was skipped
-        }
-```
-
-## Task 3. Asking the user.
-
-Implement the following logic in your application.
-
-When the program encounters incorrect data, it should ask the user for input. The user has 4 options.
-
-1. Skip the row as corrupt.
-2. Fill the row with default data, trying to "repair" it and add it to the vector of passengers.
-3. Choose and remember option 1, so the user isn't asked anymore.
-4. Choose and remember option 2, so the user isn't asked anymore.
-
-
-### Additional subtask
-
-Add option 5: "Exit the program" by throwing another exception and catching it in `main()`.
-
-
+1. Develop a custom exception class AppExcept , choose an appropriate base class (e.g., std::runtime_error or std::exception classes).
+2. Define in it a user-defined data type enum class ErrorCode describing a list of possible incorrect situations that the program expects.
+3. Create a constructor for AppExcept that allows you to raise an exception object with an error code and (optionally) an informative message for the developer (specify the ancestor class).
+4. In the main() function, add a “top-level” exception dispatcher that handles application exceptions ( AppExcept ), all standardized exceptions (std::exception ), and all others ( ... ).
+5. Handle AppExcept exceptions 
+    1. by the switch block, 
+    2. by the associated map “error code” → “message test”.
