@@ -2,7 +2,6 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include <algorithm>
 #include <iomanip>
 
 enum class PClass
@@ -34,6 +33,26 @@ struct Passenger
     double fare;
     std::string cabin;
     std::string embarked;
+    
+    Passenger() {}
+    
+    
+    Passenger(int number)
+    {
+        id = number;
+    }
+};
+
+struct PassengerWithCity : public Passenger
+{
+    std::string cityName;
+    
+    PassengerWithCity(int number)
+        :Passenger(number)
+    {
+        cityName = "default";
+    }
+    
 };
 
 // task 2
@@ -43,20 +62,23 @@ struct Passenger
 // 3. Data row is not full.
 enum class ErrorCode
 {
-    
+    noFile,
 };
 
 // task 1
 // https://en.cppreference.com/w/cpp/error/exception
-class AppExceptExample : public std::runtime_error
+class AppExcept : public std::runtime_error
 {
-    ErrorCode errorMessage;
+    ErrorCode _code;
+public:
     // task 3
-    AppExceptExample(ErrorCode code, const char* errorMessage = "") 
-        :std::runtime_error(errorMessage)
+    AppExcept(ErrorCode code, const char* errorMessage = "") 
+        :std::runtime_error("")
     {
-        
+        _code = code;
     }
+    
+    ErrorCode getCode() const {return _code;}
 };
 
 
@@ -103,10 +125,11 @@ int toInt(const std::string& buffer)
     }
     catch(std::invalid_argument const& ex)
     {
-      std::cerr << "std::invalid_argument: " << ex.what() << "\n";
-      std::cerr << "Could not parse string: '" << buffer <<"'\n";
-      std::cerr << "Using value " << DEFAULT_AGE << " as default" << '\n';
-      i = DEFAULT_AGE;
+        throw AppExcept(ErrorCode::incorrectType);
+        std::cerr << "std::invalid_argument: " << ex.what() << "\n";
+        std::cerr << "Could not parse string: '" << buffer <<"'\n";
+        std::cerr << "Using value " << DEFAULT_AGE << " as default" << '\n';
+        i = DEFAULT_AGE;
     }
 
     return i;
@@ -152,7 +175,11 @@ Passenger extractData(std::istream& in)
     std::getline(in, buffer, ','); // Cabin
     newPassenger.cabin = buffer;
 
-    std::getline(in, buffer, '\n'); // Embarked
+    if(!std::getline(in, buffer, '\n'))
+    {
+        throw...
+    }
+    // Embarked
     newPassenger.embarked = buffer;
     return newPassenger;
 }
@@ -174,6 +201,11 @@ VecPassengers loadData(std::istream& in)
 
 int main ()
 {
+    
+    PassengerWithCity a(10);
+    a.age = 10;
+//    a.
+    
     const std::string INPUT_FILE_NAME = "../../data/titanic.csv";
     std::ifstream inputFile;
     
@@ -181,12 +213,28 @@ int main ()
     try {
     
         inputFile.open(INPUT_FILE_NAME);
+        
+        if(!inputFile.is_open())
+        {
+            throw AppExcept(ErrorCode::noFile);
+        }
+        
         VecPassengers passengers = loadData(inputFile);
         std::cout << passengers[0];
     }
-//    catch (/* fill here */){
+    catch (const AppExcept& e){
         
-//    }
+        switch (e.getCode()) {
+        case ErrorCode::noFile:
+            std::cout << "something";
+            break;
+        case ErrorCode::secondError:
+            // no file
+            break;
+        default:
+            break;
+        }
+    }
     catch (...) {
     }
     
